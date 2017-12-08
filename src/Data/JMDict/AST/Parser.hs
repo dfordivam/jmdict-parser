@@ -16,11 +16,12 @@ import qualified Data.Map as Map
 import Data.Maybe
 import Data.Monoid
 import Text.Read
-import Data.JMDict.AST.AST
 import Data.Char
 import Text.XML.Stream.Parse
 import Data.Conduit
 import Data.XML.Types
+
+import Data.JMDict.AST
 
 type ParseError = T.Text
 
@@ -62,9 +63,9 @@ makeSense s = Sense
   <*> traverse makeSenseField (s ^. X.senseFields)
   <*> traverse makeSenseMisc (s ^. X.senseMisc)
   <*> pure (s ^. X.senseInfo)
-  <*> pure (s ^. X.senseSources)
+  <*> pure (map getLanguageSource (s ^. X.senseSources))
   <*> traverse makeDialect (s ^. X.senseDialects)
-  <*> pure (s ^. X.senseGlosses)
+  <*> pure (map getGloss (s ^. X.senseGlosses))
 
 ---------------------------------------------------------------
 -- TODO
@@ -229,6 +230,17 @@ makeSenseMisc t
   | t == "rare"    = Right $ Rare
   | otherwise = Left $ "makeSenseMisc: Invalid value: " <> t
 
+getLanguageSource :: X.LanguageSource -> LanguageSource
+getLanguageSource l = LanguageSource
+  (l ^. X.sourceOrigin)
+  (l ^. X.sourceLanguage)
+  (l ^. X.sourceFull)
+  (l ^. X.sourceWaseieigo)
+
+getGloss :: X.Gloss -> Gloss
+getGloss g = Gloss
+  (g ^. X.glossDefinition)
+  (g ^. X.glossLanguage)
 
 makeDialect :: T.Text -> Either ParseError Dialect
 makeDialect t
