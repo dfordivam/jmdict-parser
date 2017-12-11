@@ -168,7 +168,7 @@ makeXref t = case retValue of
         ((Just $ KanjiPhrase t), Nothing, Nothing)
 
 
-makeSenseField :: T.Text -> Either ParseError Field
+makeSenseField :: T.Text -> Either ParseError SenseField
 makeSenseField t
   | t ==  "comp"    = Right $ FieldComp
   | t ==  "Buddh"   = Right $ FieldBuddh
